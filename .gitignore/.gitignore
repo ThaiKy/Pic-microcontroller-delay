@@ -1,0 +1,40 @@
+#define SW1 PORTC.RC0
+
+
+char latdelay, portdelay;
+
+void InitTimer0(){
+  OPTION_REG     = 0x87;
+  TMR0           = 6;
+  INTCON         = 0xA0;
+}
+
+void Interrupt(){
+  if (TMR0IF_bit){
+   TMR0IF_bit   = 0;
+   TMR0         = 6;
+   latdelay++;
+  if (latdelay>3){
+    portdelay=1;
+    latdelay=0;
+   }
+  }
+}
+
+void main(){
+ InitTimer0();
+ TRISC.RC0 = 1;
+ TRISB     = 0;
+ PORTB     = 0x00;
+
+ while (1){ 
+     if (SW1 == 0)
+     {
+      latdelay=0;
+     if (SW1 == 0  &&  portdelay == 1){
+     PORTB = ~PORTB;
+     portdelay=0;
+     }
+   }
+ }
+}
